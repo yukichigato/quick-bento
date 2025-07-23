@@ -23,3 +23,7 @@ grid.deformCell({
   colStart: 0,
   colEnd: 1,
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  grid.addCellCreateEventListener();
+});
