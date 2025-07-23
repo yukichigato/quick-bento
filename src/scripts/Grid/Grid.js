@@ -2,8 +2,13 @@ import Cell from "./Cell.js";
 import GridRow from "./GridRow.js";
 import GridCol from "./GridCol.js";
 
+const ROW_OFFSET = 1;
+const COL_OFFSET = 1;
+const DEFAULT_WIDTH = 1;
+const DEFAULT_HEIGHT = 1;
+
 class Grid {
-  constructor({ rowAmount, colAmount, gap = 0 }) {
+  constructor({ rowAmount, colAmount, gap = 0.5 }) {
     this.rows = Array.from(
       { length: rowAmount },
       (_, rowIndex) => new GridRow({ rowIndex })
@@ -22,6 +27,17 @@ class Grid {
     );
 
     this.drawGrid();
+  }
+
+  addCellCreateEventListener() {
+    const emptyCells = document.querySelectorAll(".empty-cell");
+    emptyCells.forEach((cell) => {
+      cell.addEventListener("click", () => {
+        const row = parseInt(cell.dataset.row, 10);
+        const col = parseInt(cell.dataset.col, 10);
+        this.addCell({ row, col });
+      });
+    });
   }
 
   deformCell({ cellIndex, rowStart, rowEnd, colStart, colEnd }) {
@@ -112,7 +128,7 @@ class Grid {
   }
 
   addCell({ row, col }) {
-    if (row < 0 || col >= this.colAmount || row > col) {
+    if (row < 0 || col >= this.colAmount) {
       throw new Error("Invalid range");
     }
 
@@ -130,7 +146,7 @@ class Grid {
     this.mesh[row][col] = { isUsed: true };
 
     this.cells.push(cell);
-    this.drawCells();
+    this.drawContent();
   }
 
   drawGrid() {
@@ -156,6 +172,7 @@ class Grid {
 
     this.drawCells();
     this.drawEmptyCells();
+    this.addCellCreateEventListener();
   }
 
   drawEmptyCells() {
@@ -163,15 +180,19 @@ class Grid {
       this.cols.forEach((col) => {
         if (this.mesh[row.rowIndex][col.colIndex].isUsed) return;
         const grid = document.querySelector("#grid");
+
         const emptyCellDiv = document.createElement("div");
         emptyCellDiv.className = "empty-cell";
+        emptyCellDiv.setAttribute("data-row", row.rowIndex);
+        emptyCellDiv.setAttribute("data-col", col.colIndex);
         Object.assign(emptyCellDiv.style, {
-          gridRowStart: row.rowIndex + 1,
-          gridRowEnd: row.rowIndex + 2,
-          gridColumnStart: col.colIndex + 1,
-          gridColumnEnd: col.colIndex + 2,
+          gridRowStart: row.rowIndex + ROW_OFFSET,
+          gridRowEnd: row.rowIndex + ROW_OFFSET + DEFAULT_WIDTH,
+          gridColumnStart: col.colIndex + COL_OFFSET,
+          gridColumnEnd: col.colIndex + COL_OFFSET + DEFAULT_HEIGHT,
           backgroundColor: "lightgray",
         });
+
         grid.appendChild(emptyCellDiv);
       });
     });
@@ -180,15 +201,19 @@ class Grid {
   drawCells() {
     this.cells.forEach((cell) => {
       const grid = document.querySelector("#grid");
+
       const cellDiv = document.createElement("div");
       cellDiv.className = "cell";
+      cellDiv.setAttribute("data-row-start", cell.rowStart);
+      cellDiv.setAttribute("data-row-end", cell.rowEnd);
+      cellDiv.setAttribute("data-col-start", cell.colStart);
+      cellDiv.setAttribute("data-col-end", cell.colEnd);
       Object.assign(cellDiv.style, {
-        gridRowStart: cell.rowStart + 1,
-        gridRowEnd: cell.rowEnd + 2,
-        gridColumnStart: cell.colStart + 1,
-        gridColumnEnd: cell.colEnd + 2,
+        gridRowStart: cell.rowStart + ROW_OFFSET,
+        gridRowEnd: cell.rowEnd + ROW_OFFSET + DEFAULT_WIDTH,
+        gridColumnStart: cell.colStart + COL_OFFSET,
+        gridColumnEnd: cell.colEnd + COL_OFFSET + DEFAULT_HEIGHT,
         backgroundColor: "lightblue",
-        zIndex: 1,
       });
       grid.appendChild(cellDiv);
     });
