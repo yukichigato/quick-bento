@@ -1,6 +1,7 @@
 import Cell from "./Cell.js";
 import GridRow from "./GridRow.js";
 import GridCol from "./GridCol.js";
+import { updateMesh, revertMeshUpdate } from "./utils.js";
 
 const ROW_OFFSET = 1;
 const COL_OFFSET = 1;
@@ -31,17 +32,10 @@ class Grid {
     this.mesh = Array.from({ length: rowAmount }, () =>
       Array.from({ length: colAmount }, () => ({ isUsed: false }))
     );
-
     this.handleEmptyCellClick = this.handleEmptyCellClick.bind(this);
   }
 
-  handleEmptyCellClick(event) {
-    const row = parseInt(event.target.dataset.row, 10);
-    const col = parseInt(event.target.dataset.col, 10);
-    this.addCell({ row, col });
-  }
-
-  deformCell({ cellIndex, rowStart, rowEnd, colStart, colEnd }) {
+  deformCell = ({ cellIndex, rowStart, rowEnd, colStart, colEnd }) => {
     const cell = this.cells[cellIndex];
     if (!cell) {
       throw new Error("Cell not found");
@@ -58,33 +52,24 @@ class Grid {
       throw new Error("Invalid range");
     }
 
-    for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
-      for (let j = cell.colStart; j <= cell.colEnd; j++) {
-        this.mesh[i][j].isUsed = false;
-      }
-    }
-
-    for (let i = rowStart; i <= rowEnd; i++) {
-      for (let j = colStart; j <= colEnd; j++) {
-        if (this.mesh[i][j].isUsed) {
-          throw new Error(
-            "Target position already occupied at row " + i + ", col " + j
-          );
-        }
-        this.mesh[i][j].isUsed = true;
-      }
-    }
+    updateMesh({
+      grid: this,
+      cell,
+      newRowStart: rowStart,
+      newColStart: colStart,
+      newRowEnd: rowEnd,
+      newColEnd: colEnd,
+    });
 
     cell.rowStart = rowStart;
     cell.rowEnd = rowEnd;
     cell.colStart = colStart;
     cell.colEnd = colEnd;
     this.cells[cellIndex] = cell;
-
     this.drawContent();
-  }
+  };
 
-  moveCell({ cellIndex, movementRows, movementCols }) {
+  moveCell = ({ cellIndex, movementRows, movementCols }) => {
     const cell = this.cells[cellIndex];
     if (!cell) {
       throw new Error("Cell not found");
@@ -104,21 +89,14 @@ class Grid {
       throw new Error("Movement out of bounds");
     }
 
-    for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
-      for (let j = cell.colStart; j <= cell.colEnd; j++) {
-        this.mesh[i][j].isUsed = false;
-      }
-    }
-
-    for (let i = newRowStart; i <= newRowEnd; i++) {
-      for (let j = newColStart; j <= newColEnd; j++) {
-        if (this.mesh[i][j].isUsed) {
-          throw new Error("Target position already occupied");
-        }
-
-        this.mesh[i][j].isUsed = true;
-      }
-    }
+    updateMesh({
+      grid: this,
+      cell,
+      newRowStart,
+      newColStart,
+      newRowEnd,
+      newColEnd,
+    });
 
     cell.rowStart = newRowStart;
     cell.colStart = newColStart;
@@ -128,9 +106,9 @@ class Grid {
     this.cells[cellIndex] = cell;
 
     this.drawContent();
-  }
+  };
 
-  addCell({ row, col }) {
+  addCell = ({ row, col }) => {
     if (row < 0 || col < 0 || col >= this.colAmount || row >= this.rowAmount) {
       throw new Error("Invalid range");
     }
@@ -151,9 +129,9 @@ class Grid {
 
     this.cells.push(cell);
     this.drawContent();
-  }
+  };
 
-  drawGrid() {
+  drawGrid = () => {
     const gridArea = document.querySelector("#gridArea");
     const div = document.createElement("div");
     div.id = "grid";
@@ -167,9 +145,9 @@ class Grid {
       height: "100%",
     });
     gridArea.appendChild(div);
-  }
+  };
 
-  drawContent() {
+  drawContent = () => {
     const grid = document.querySelector("#grid");
     if (grid) {
       this.removeEventListeners();
@@ -183,10 +161,11 @@ class Grid {
 
     this.cells.forEach((cell) => {
       cell.allowDrag();
+      cell.allowResize();
     });
-  }
+  };
 
-  drawEmptyCells() {
+  drawEmptyCells = () => {
     this.rows.forEach((row) => {
       this.cols.forEach((col) => {
         if (this.mesh[row.rowIndex][col.colIndex].isUsed) return;
@@ -206,13 +185,16 @@ class Grid {
         grid.appendChild(emptyCellDiv);
       });
     });
-  }
+  };
 
-  drawCells() {
+  drawCells = () => {
     this.cells.forEach((cell) => {
       const grid = document.querySelector("#grid");
 
       const cellDiv = document.createElement("div");
+      const closeButton = document.createElement("button");
+      closeButton.textContent = "X";
+
       cellDiv.className = "cell";
       cellDiv.setAttribute("data-row-start", cell.rowStart);
       cellDiv.setAttribute("data-row-end", cell.rowEnd);
@@ -225,30 +207,37 @@ class Grid {
         gridColumnEnd: cell.colEnd + COL_OFFSET + 1,
       });
       grid.appendChild(cellDiv);
+      cellDiv.appendChild(closeButton);
     });
-  }
+  };
 
-  addCellCreateEventListener() {
+  handleEmptyCellClick = (e) => {
+    const row = parseInt(e.target.dataset.row, 10);
+    const col = parseInt(e.target.dataset.col, 10);
+    this.addCell({ row, col });
+  };
+
+  addCellCreateEventListener = () => {
     const emptyCells = document.querySelectorAll(".empty-cell");
     emptyCells.forEach((cell) => {
       cell.addEventListener("click", this.handleEmptyCellClick);
     });
-  }
+  };
 
-  updateEmptyCells() {
+  updateEmptyCells = () => {
     const existingEmptyCells = document.querySelectorAll(".empty-cell");
     existingEmptyCells.forEach((cell) => cell.remove());
 
     this.drawEmptyCells();
     this.addCellCreateEventListener();
-  }
+  };
 
-  removeEventListeners() {
+  removeEventListeners = () => {
     const emptyCells = document.querySelectorAll(".empty-cell");
     emptyCells.forEach((cell) => {
       cell.removeEventListener("click", this.handleEmptyCellClick);
     });
-  }
+  };
 
   destroy() {
     this.removeEventListeners();

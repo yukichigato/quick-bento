@@ -1,74 +1,14 @@
+import {
+  getClosestGridCell,
+  getClosestGridCellResize,
+  temporaryMeshChange,
+  revertMeshChange,
+} from "./utils.js";
+
 let newX = 0;
 let newY = 0;
 let startX = 0;
 let startY = 0;
-
-function getClosestGridCell(element) {
-  const grid = document.querySelector("#grid");
-  const children = grid.querySelectorAll(".empty-cell");
-  const elemRect = element.getBoundingClientRect();
-
-  let closest = null;
-  let closestDistance = Infinity;
-
-  const elemUpperLeftCenter = {
-    x: elemRect.left + elemRect.width / 4,
-    y: elemRect.top + elemRect.height / 4,
-  };
-
-  children.forEach((child) => {
-    const rect = child.getBoundingClientRect();
-    const center = {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    };
-
-    const distance = Math.hypot(
-      elemUpperLeftCenter.x - center.x,
-      elemUpperLeftCenter.y - center.y
-    );
-
-    if (distance > elemRect.width) return;
-
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closest = child;
-    }
-  });
-
-  if (!closest) return { row: null, col: null };
-
-  return {
-    row: parseInt(closest.dataset.row, 10),
-    col: parseInt(closest.dataset.col, 10),
-  };
-}
-
-function temporaryMeshChange(gridInstance, rowStart, rowEnd, colStart, colEnd) {
-  for (let row = rowStart; row <= rowEnd; row++) {
-    for (let col = colStart; col <= colEnd; col++) {
-      if (!gridInstance.mesh[row][col].isUsed) {
-        return;
-      }
-
-      gridInstance.mesh[row][col].isUsed = false;
-    }
-  }
-
-  // Update only the empty cells to show visual feedback without interrupting drag
-  gridInstance.updateEmptyCells();
-}
-
-function revertMeshChange(gridInstance, rowStart, rowEnd, colStart, colEnd) {
-  for (let row = rowStart; row <= rowEnd; row++) {
-    for (let col = colStart; col <= colEnd; col++) {
-      gridInstance.mesh[row][col].isUsed = true;
-    }
-  }
-
-  // Update only the empty cells to show visual feedback
-  gridInstance.updateEmptyCells();
-}
 
 class Cell {
   constructor({ rowStart, rowEnd, colStart, colEnd, gridInstance }) {
@@ -77,14 +17,117 @@ class Cell {
     this.colStart = colStart;
     this.colEnd = colEnd;
     this.gridInstance = gridInstance;
+    this.resizing = false;
   }
 
-  allowDrag() {
-    const cellDiv = document.querySelector(
+  getCell = () => {
+    return document.querySelector(
       `[data-row-start="${this.rowStart}"][data-col-start="${this.colStart}"]`
     );
+  };
+
+  allowResize = () => {
+    const cellDiv = this.getCell();
+    const resizeArea = document.createElement("div");
+    resizeArea.className = "resize-area";
+    Object.assign(resizeArea.style, {
+      position: "absolute",
+      bottom: "0",
+      right: "0",
+      width: "20%",
+      height: "20%",
+      cursor: "nwse-resize",
+      // backgroundColor: "red",
+      zIndex: "10",
+    });
+
+    resizeArea.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      this.resizing = true;
+      cellDiv.style.cursor = "nwse-resize";
+      cellDiv.style.zIndex = 50;
+      cellDiv.style.opacity = 0.8;
+
+      const mouseMove = (e) => {
+        const rect = cellDiv.getBoundingClientRect();
+        const newWidth = e.clientX - rect.left;
+        const newHeight = e.clientY - rect.top;
+
+        cellDiv.style.width = `${newWidth}px`;
+        cellDiv.style.height = `${newHeight}px`;
+      };
+
+      const mouseUp = (e) => {
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+
+        const { row, col } = getClosestGridCellResize(cellDiv);
+
+        if (row !== null && col !== null) {
+          try {
+            this.gridInstance.deformCell({
+              cellIndex: this.gridInstance.cells.indexOf(this),
+              rowStart: this.rowStart,
+              rowEnd: row,
+              colStart: this.colStart,
+              colEnd: col,
+            });
+
+            this.resizing = false;
+            return;
+          } catch (error) {
+            console.error("Error moving cell:", error.message);
+          }
+        }
+
+        revertMeshChange(
+          this.gridInstance,
+          this.rowStart,
+          this.rowEnd,
+          this.colStart,
+          this.colEnd
+        );
+
+        cellDiv.style.cursor = "grab";
+        cellDiv.style.width = `${originalWidth}px`;
+        cellDiv.style.height = `${originalHeight}px`;
+        cellDiv.style.opacity = 1;
+        this.resizing = false;
+      };
+
+      const rect = cellDiv.getBoundingClientRect();
+
+      const originalWidth = rect.width;
+      const originalHeight = rect.height;
+
+      cellDiv.style.position = "fixed";
+      cellDiv.style.cursor = "grabbing";
+      cellDiv.style.zIndex = 50;
+      cellDiv.style.width = `${rect.width}px`;
+      cellDiv.style.height = `${rect.height}px`;
+      cellDiv.style.left = `${rect.left}px`;
+      cellDiv.style.top = `${rect.top}px`;
+
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
+
+      temporaryMeshChange(
+        this.gridInstance,
+        this.rowStart,
+        this.rowEnd,
+        this.colStart,
+        this.colEnd
+      );
+    });
+
+    cellDiv.appendChild(resizeArea);
+  };
+
+  allowDrag = () => {
+    const cellDiv = this.getCell();
 
     cellDiv.addEventListener("mousedown", (e) => {
+      if (this.resizing) return;
       const mouseMove = (e) => {
         newX = startX - e.clientX;
         newY = startY - e.clientY;
@@ -124,11 +167,13 @@ class Cell {
           this.colEnd
         );
 
-        cellDiv.style.position = "static";
+        cellDiv.style.position = "relative";
         cellDiv.style.cursor = "grab";
         cellDiv.style.zIndex = "auto";
         cellDiv.style.width = "auto";
         cellDiv.style.height = "auto";
+        cellDiv.style.left = "auto";
+        cellDiv.style.top = "auto";
       };
 
       const rect = cellDiv.getBoundingClientRect();
@@ -155,7 +200,7 @@ class Cell {
         this.colEnd
       );
     });
-  }
+  };
 }
 
 export default Cell;
