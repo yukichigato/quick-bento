@@ -27,3 +27,12 @@ body {
 
   background-color: rgba(255, 229, 229, 0.5);
 }
+
+.empty-cell:hover {
+  cursor: pointer;
+  background-color: black;
+}
+
+.cell:hover {
+  cursor: grab;
+}

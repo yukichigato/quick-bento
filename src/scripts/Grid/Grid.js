@@ -4,11 +4,17 @@ import GridCol from "./GridCol.js";
 
 const ROW_OFFSET = 1;
 const COL_OFFSET = 1;
-const DEFAULT_WIDTH = 1;
-const DEFAULT_HEIGHT = 1;
 
 class Grid {
   constructor({ rowAmount, colAmount, gap = 0.5 }) {
+    if (rowAmount <= 0 || colAmount <= 0) {
+      throw new Error("Row and column amounts must be greater than zero");
+    }
+
+    if (gap < 0) {
+      throw new Error("Gap must be a non-negative number in rem");
+    }
+
     this.rows = Array.from(
       { length: rowAmount },
       (_, rowIndex) => new GridRow({ rowIndex })
@@ -23,21 +29,16 @@ class Grid {
     this.padding = 1; // rem
     this.cells = [];
     this.mesh = Array.from({ length: rowAmount }, () =>
-      Array(colAmount).fill({ isUsed: false })
+      Array.from({ length: colAmount }, () => ({ isUsed: false }))
     );
 
-    this.drawGrid();
+    this.handleEmptyCellClick = this.handleEmptyCellClick.bind(this);
   }
 
-  addCellCreateEventListener() {
-    const emptyCells = document.querySelectorAll(".empty-cell");
-    emptyCells.forEach((cell) => {
-      cell.addEventListener("click", () => {
-        const row = parseInt(cell.dataset.row, 10);
-        const col = parseInt(cell.dataset.col, 10);
-        this.addCell({ row, col });
-      });
-    });
+  handleEmptyCellClick(event) {
+    const row = parseInt(event.target.dataset.row, 10);
+    const col = parseInt(event.target.dataset.col, 10);
+    this.addCell({ row, col });
   }
 
   deformCell({ cellIndex, rowStart, rowEnd, colStart, colEnd }) {
@@ -50,14 +51,16 @@ class Grid {
       rowStart < 0 ||
       rowEnd >= this.rowAmount ||
       colStart < 0 ||
-      colEnd >= this.colAmount
+      colEnd >= this.colAmount ||
+      rowStart > rowEnd ||
+      colStart > colEnd
     ) {
       throw new Error("Invalid range");
     }
 
     for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
       for (let j = cell.colStart; j <= cell.colEnd; j++) {
-        this.mesh[i][j] = { isUsed: false };
+        this.mesh[i][j].isUsed = false;
       }
     }
 
@@ -68,7 +71,7 @@ class Grid {
             "Target position already occupied at row " + i + ", col " + j
           );
         }
-        this.mesh[i][j] = { isUsed: true };
+        this.mesh[i][j].isUsed = true;
       }
     }
 
@@ -103,17 +106,17 @@ class Grid {
 
     for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
       for (let j = cell.colStart; j <= cell.colEnd; j++) {
-        this.mesh[i][j] = { isUsed: false };
+        this.mesh[i][j].isUsed = false;
       }
     }
 
     for (let i = newRowStart; i <= newRowEnd; i++) {
       for (let j = newColStart; j <= newColEnd; j++) {
-        if (this.rows[i].isUsed || this.cols[j].isUsed) {
+        if (this.mesh[i][j].isUsed) {
           throw new Error("Target position already occupied");
         }
 
-        this.mesh[i][j] = { isUsed: true };
+        this.mesh[i][j].isUsed = true;
       }
     }
 
@@ -128,11 +131,11 @@ class Grid {
   }
 
   addCell({ row, col }) {
-    if (row < 0 || col >= this.colAmount) {
+    if (row < 0 || col < 0 || col >= this.colAmount || row >= this.rowAmount) {
       throw new Error("Invalid range");
     }
 
-    if (this.rows[row].isUsed || this.cols[col].isUsed) {
+    if (this.mesh[row][col].isUsed) {
       throw new Error("Cell already in use");
     }
 
@@ -143,7 +146,7 @@ class Grid {
       colEnd: col,
     });
 
-    this.mesh[row][col] = { isUsed: true };
+    this.mesh[row][col].isUsed = true;
 
     this.cells.push(cell);
     this.drawContent();
@@ -167,12 +170,19 @@ class Grid {
 
   drawContent() {
     const grid = document.querySelector("#grid");
-    grid.remove();
+    if (grid) {
+      this.removeEventListeners();
+      grid.remove();
+    }
     this.drawGrid();
 
     this.drawCells();
     this.drawEmptyCells();
     this.addCellCreateEventListener();
+
+    this.cells.forEach((cell) => {
+      cell.allowDrag();
+    });
   }
 
   drawEmptyCells() {
@@ -187,9 +197,9 @@ class Grid {
         emptyCellDiv.setAttribute("data-col", col.colIndex);
         Object.assign(emptyCellDiv.style, {
           gridRowStart: row.rowIndex + ROW_OFFSET,
-          gridRowEnd: row.rowIndex + ROW_OFFSET + DEFAULT_WIDTH,
+          gridRowEnd: row.rowIndex + ROW_OFFSET + 1,
           gridColumnStart: col.colIndex + COL_OFFSET,
-          gridColumnEnd: col.colIndex + COL_OFFSET + DEFAULT_HEIGHT,
+          gridColumnEnd: col.colIndex + COL_OFFSET + 1,
           backgroundColor: "lightgray",
         });
 
@@ -210,13 +220,35 @@ class Grid {
       cellDiv.setAttribute("data-col-end", cell.colEnd);
       Object.assign(cellDiv.style, {
         gridRowStart: cell.rowStart + ROW_OFFSET,
-        gridRowEnd: cell.rowEnd + ROW_OFFSET + DEFAULT_WIDTH,
+        gridRowEnd: cell.rowEnd + ROW_OFFSET + 1,
         gridColumnStart: cell.colStart + COL_OFFSET,
-        gridColumnEnd: cell.colEnd + COL_OFFSET + DEFAULT_HEIGHT,
+        gridColumnEnd: cell.colEnd + COL_OFFSET + 1,
         backgroundColor: "lightblue",
       });
       grid.appendChild(cellDiv);
     });
+  }
+
+  addCellCreateEventListener() {
+    const emptyCells = document.querySelectorAll(".empty-cell");
+    emptyCells.forEach((cell) => {
+      cell.addEventListener("click", this.handleEmptyCellClick);
+    });
+  }
+
+  removeEventListeners() {
+    const emptyCells = document.querySelectorAll(".empty-cell");
+    emptyCells.forEach((cell) => {
+      cell.removeEventListener("click", this.handleEmptyCellClick);
+    });
+  }
+
+  destroy() {
+    this.removeEventListeners();
+    const grid = document.querySelector("#grid");
+    if (grid) {
+      grid.remove();
+    }
   }
 }
 
