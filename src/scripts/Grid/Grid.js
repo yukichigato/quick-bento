@@ -144,6 +144,7 @@ class Grid {
       rowEnd: row,
       colStart: col,
       colEnd: col,
+      gridInstance: this,
     });
 
     this.mesh[row][col].isUsed = true;
@@ -200,7 +201,6 @@ class Grid {
           gridRowEnd: row.rowIndex + ROW_OFFSET + 1,
           gridColumnStart: col.colIndex + COL_OFFSET,
           gridColumnEnd: col.colIndex + COL_OFFSET + 1,
-          backgroundColor: "lightgray",
         });
 
         grid.appendChild(emptyCellDiv);
@@ -223,7 +223,6 @@ class Grid {
         gridRowEnd: cell.rowEnd + ROW_OFFSET + 1,
         gridColumnStart: cell.colStart + COL_OFFSET,
         gridColumnEnd: cell.colEnd + COL_OFFSET + 1,
-        backgroundColor: "lightblue",
       });
       grid.appendChild(cellDiv);
     });
@@ -234,6 +233,14 @@ class Grid {
     emptyCells.forEach((cell) => {
       cell.addEventListener("click", this.handleEmptyCellClick);
     });
+  }
+
+  updateEmptyCells() {
+    const existingEmptyCells = document.querySelectorAll(".empty-cell");
+    existingEmptyCells.forEach((cell) => cell.remove());
+
+    this.drawEmptyCells();
+    this.addCellCreateEventListener();
   }
 
   removeEventListeners() {

@@ -25,12 +25,34 @@ body {
   width: 42rem;
   height: 42rem;
 
-  background-color: rgba(255, 229, 229, 0.5);
+  background-color: black;
+}
+
+.cell {
+  border-radius: 1rem;
+
+  background-color: rgb(255, 187, 187);
+}
+
+.empty-cell {
+  width: 90%;
+  height: 90%;
+
+  align-self: center;
+  justify-self: center;
+
+  border: 0.25rem solid white;
+  border-radius: 1rem;
+
+  z-index: 10;
+
+  background-color: none;
 }
 
 .empty-cell:hover {
   cursor: pointer;
-  background-color: black;
+  background-color: rgba(255, 255, 255, 0.645);
+  transition: background-color 0.2s ease;
 }
 
 .cell:hover {
