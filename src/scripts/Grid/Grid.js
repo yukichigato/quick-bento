@@ -1,13 +1,25 @@
 import Cell from "./Cell.js";
-import GridRow from "./GridRow.js";
-import GridCol from "./GridCol.js";
-import { updateMesh, revertMeshUpdate } from "./utils.js";
+import { updateMesh } from "./utils.js";
 
 const ROW_OFFSET = 1;
 const COL_OFFSET = 1;
 
+class GridCol {
+  constructor({ colIndex, height = 1 }) {
+    this.colIndex = colIndex;
+    this.height = height; // rem
+  }
+}
+
+class GridRow {
+  constructor({ rowIndex, width = 1 }) {
+    this.rowIndex = rowIndex;
+    this.width = width; // rem
+  }
+}
+
 class Grid {
-  constructor({ rowAmount, colAmount, gap = 0.5 }) {
+  constructor({ rowAmount, colAmount, gap }) {
     if (rowAmount <= 0 || colAmount <= 0) {
       throw new Error("Row and column amounts must be greater than zero");
     }
@@ -32,7 +44,7 @@ class Grid {
     this.mesh = Array.from({ length: rowAmount }, () =>
       Array.from({ length: colAmount }, () => ({ isUsed: false }))
     );
-    this.handleEmptyCellClick = this.handleEmptyCellClick.bind(this);
+    this.eventCreateNewCell = this.eventCreateNewCell.bind(this);
   }
 
   deformCell = ({ cellIndex, rowStart, rowEnd, colStart, colEnd }) => {
@@ -61,11 +73,12 @@ class Grid {
       newColEnd: colEnd,
     });
 
-    cell.rowStart = rowStart;
-    cell.rowEnd = rowEnd;
-    cell.colStart = colStart;
-    cell.colEnd = colEnd;
-    this.cells[cellIndex] = cell;
+    Object.assign(this.cells[cellIndex], {
+      rowStart,
+      rowEnd,
+      colStart,
+      colEnd,
+    });
     this.drawContent();
   };
 
@@ -98,13 +111,12 @@ class Grid {
       newColEnd,
     });
 
-    cell.rowStart = newRowStart;
-    cell.colStart = newColStart;
-    cell.rowEnd = newRowEnd;
-    cell.colEnd = newColEnd;
-
-    this.cells[cellIndex] = cell;
-
+    Object.assign(this.cells[cellIndex], {
+      rowStart: newRowStart,
+      rowEnd: newRowEnd,
+      colStart: newColStart,
+      colEnd: newColEnd,
+    });
     this.drawContent();
   };
 
@@ -126,15 +138,13 @@ class Grid {
     });
 
     this.mesh[row][col].isUsed = true;
-
     this.cells.push(cell);
     this.drawContent();
   };
 
   drawGrid = () => {
     const gridArea = document.querySelector("#gridArea");
-    const div = document.createElement("div");
-    div.id = "grid";
+    const div = Object.assign(document.createElement("div"), { id: "grid" });
     Object.assign(div.style, {
       display: "grid",
       gridTemplateRows: `repeat(${this.rowAmount}, 1fr)`,
@@ -154,11 +164,9 @@ class Grid {
       grid.remove();
     }
     this.drawGrid();
-
     this.drawCells();
     this.drawEmptyCells();
-    this.addCellCreateEventListener();
-
+    this.allowCreateNew();
     this.cells.forEach((cell) => {
       cell.allowDrag();
       cell.allowResize();
@@ -182,7 +190,6 @@ class Grid {
           gridColumnStart: col.colIndex + COL_OFFSET,
           gridColumnEnd: col.colIndex + COL_OFFSET + 1,
         });
-
         grid.appendChild(emptyCellDiv);
       });
     });
@@ -213,16 +220,10 @@ class Grid {
     });
   };
 
-  handleEmptyCellClick = (e) => {
-    const row = parseInt(e.target.dataset.row, 10);
-    const col = parseInt(e.target.dataset.col, 10);
-    this.addCell({ row, col });
-  };
-
-  addCellCreateEventListener = () => {
+  allowCreateNew = () => {
     const emptyCells = document.querySelectorAll(".empty-cell");
     emptyCells.forEach((cell) => {
-      cell.addEventListener("click", this.handleEmptyCellClick);
+      cell.addEventListener("click", this.eventCreateNewCell);
     });
   };
 
@@ -231,13 +232,19 @@ class Grid {
     existingEmptyCells.forEach((cell) => cell.remove());
 
     this.drawEmptyCells();
-    this.addCellCreateEventListener();
+    this.allowCreateNew();
+  };
+
+  eventCreateNewCell = (e) => {
+    const row = parseInt(e.target.dataset.row, 10);
+    const col = parseInt(e.target.dataset.col, 10);
+    this.addCell({ row, col });
   };
 
   removeEventListeners = () => {
     const emptyCells = document.querySelectorAll(".empty-cell");
     emptyCells.forEach((cell) => {
-      cell.removeEventListener("click", this.handleEmptyCellClick);
+      cell.removeEventListener("click", this.eventCreateNewCell);
     });
   };
 

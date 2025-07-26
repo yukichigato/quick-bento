@@ -72,9 +72,11 @@ class Cell {
     resizeArea.addEventListener("mousedown", (e) => {
       e.preventDefault();
       this.resizing = true;
-      cellDiv.style.cursor = "nwse-resize";
-      cellDiv.style.zIndex = 50;
-      cellDiv.style.opacity = 0.8;
+      Object.assign(cellDiv.style, {
+        cursor: "nwse-resize",
+        zIndex: 50,
+        opacity: 0.8,
+      });
 
       const mouseMove = (e) => {
         const rect = cellDiv.getBoundingClientRect();
@@ -116,25 +118,28 @@ class Cell {
           this.colEnd
         );
 
-        cellDiv.style.cursor = "grab";
-        cellDiv.style.width = `${originalWidth}px`;
-        cellDiv.style.height = `${originalHeight}px`;
-        cellDiv.style.opacity = 1;
+        Object.assign(cellDiv.style, {
+          cursor: "grab",
+          width: `${originalWidth}px`,
+          height: `${originalHeight}px`,
+          opacity: 1,
+        });
         this.resizing = false;
       };
 
       const rect = cellDiv.getBoundingClientRect();
-
       const originalWidth = rect.width;
       const originalHeight = rect.height;
 
-      cellDiv.style.position = "fixed";
-      cellDiv.style.cursor = "grabbing";
-      cellDiv.style.zIndex = 50;
-      cellDiv.style.width = `${rect.width}px`;
-      cellDiv.style.height = `${rect.height}px`;
-      cellDiv.style.left = `${rect.left}px`;
-      cellDiv.style.top = `${rect.top}px`;
+      Object.assign(cellDiv.style, {
+        position: "fixed",
+        cursor: "grabbing",
+        zIndex: 50,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        left: `${rect.left}px`,
+        top: `${rect.top}px`,
+      });
 
       document.addEventListener("mousemove", mouseMove);
       document.addEventListener("mouseup", mouseUp);
@@ -163,8 +168,10 @@ class Cell {
         startX = e.clientX;
         startY = e.clientY;
 
-        cellDiv.style.left = `${cellDiv.offsetLeft - newX}px`;
-        cellDiv.style.top = `${cellDiv.offsetTop - newY}px`;
+        Object.assign(cellDiv.style, {
+          left: `${cellDiv.offsetLeft - newX}px`,
+          top: `${cellDiv.offsetTop - newY}px`,
+        });
       };
 
       const mouseUp = (e) => {
@@ -172,7 +179,6 @@ class Cell {
         document.removeEventListener("mouseup", mouseUp);
 
         const { row, col } = getClosestGridCell(cellDiv);
-
         if (row !== null && col !== null) {
           try {
             this.gridInstance.moveCell({
@@ -184,6 +190,7 @@ class Cell {
             return;
           } catch (error) {
             console.error("Error moving cell:", error.message);
+            this.gridInstance.drawContent();
           }
         }
 
@@ -195,24 +202,28 @@ class Cell {
           this.colEnd
         );
 
-        cellDiv.style.position = "relative";
-        cellDiv.style.cursor = "grab";
-        cellDiv.style.zIndex = "auto";
-        cellDiv.style.width = "auto";
-        cellDiv.style.height = "auto";
-        cellDiv.style.left = "auto";
-        cellDiv.style.top = "auto";
+        Object.assign(cellDiv.style, {
+          position: "relative",
+          cursor: "grab",
+          zIndex: "auto",
+          width: "auto",
+          height: "auto",
+          left: "auto",
+          top: "auto",
+        });
       };
 
       const rect = cellDiv.getBoundingClientRect();
 
-      cellDiv.style.position = "fixed";
-      cellDiv.style.cursor = "grabbing";
-      cellDiv.style.zIndex = 50;
-      cellDiv.style.width = `${rect.width}px`;
-      cellDiv.style.height = `${rect.height}px`;
-      cellDiv.style.left = `${rect.left}px`;
-      cellDiv.style.top = `${rect.top}px`;
+      Object.assign(cellDiv.style, {
+        position: "fixed",
+        cursor: "grabbing",
+        zIndex: 50,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        left: `${rect.left}px`,
+        top: `${rect.top}px`,
+      });
 
       startX = e.clientX;
       startY = e.clientY;

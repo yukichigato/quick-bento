@@ -15,6 +15,14 @@ const updateMesh = ({
   for (let i = newRowStart; i <= newRowEnd; i++) {
     for (let j = newColStart; j <= newColEnd; j++) {
       if (grid.mesh[i][j].isUsed) {
+        revertMeshUpdate({
+          grid,
+          cell,
+          newRowStart,
+          newColStart,
+          newRowEnd,
+          newColEnd,
+        });
         throw new Error("Target position already occupied");
       }
 
@@ -44,7 +52,7 @@ const revertMeshUpdate = ({
   }
 };
 
-function getClosestGridCell(element) {
+const getClosestGridCell = (element) => {
   const grid = document.querySelector("#grid");
   const children = grid.querySelectorAll(".empty-cell");
   const elemRect = element.getBoundingClientRect();
@@ -84,9 +92,9 @@ function getClosestGridCell(element) {
     row: parseInt(closest.dataset.row, 10),
     col: parseInt(closest.dataset.col, 10),
   };
-}
+};
 
-function getClosestGridCellResize(element) {
+const getClosestGridCellResize = (element) => {
   const grid = document.querySelector("#grid");
   const children = grid.querySelectorAll(".empty-cell");
   const elemRect = element.getBoundingClientRect();
@@ -126,7 +134,7 @@ function getClosestGridCellResize(element) {
     row: parseInt(closest.dataset.row, 10),
     col: parseInt(closest.dataset.col, 10),
   };
-}
+};
 
 const temporaryMeshChange = (
   gridInstance,
