@@ -53,8 +53,8 @@ function getClosestGridCell(element) {
   let closestDistance = Infinity;
 
   const elemCenter = {
-    x: elemRect.left + elemRect.width / 4,
-    y: elemRect.top + elemRect.height / 4,
+    x: elemRect.left + Math.sqrt(elemRect.width / 4) * 2,
+    y: elemRect.top + Math.sqrt(elemRect.height / 4) * 2,
   };
 
   children.forEach((child) => {
@@ -69,7 +69,7 @@ function getClosestGridCell(element) {
       elemCenter.y - center.y
     );
 
-    if (distance > elemRect.width * 0.6 && distance > elemRect.height * 0.6)
+    if (distance > Math.max(elemRect.height * 0.7, elemRect.width * 0.7))
       return;
 
     if (distance < closestDistance) {

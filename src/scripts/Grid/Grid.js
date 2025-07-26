@@ -162,6 +162,7 @@ class Grid {
     this.cells.forEach((cell) => {
       cell.allowDrag();
       cell.allowResize();
+      cell.allowContextMenu();
     });
   };
 
@@ -205,6 +206,7 @@ class Grid {
         gridRowEnd: cell.rowEnd + ROW_OFFSET + 1,
         gridColumnStart: cell.colStart + COL_OFFSET,
         gridColumnEnd: cell.colEnd + COL_OFFSET + 1,
+        backgroundColor: cell.color,
       });
       grid.appendChild(cellDiv);
       cellDiv.appendChild(closeButton);

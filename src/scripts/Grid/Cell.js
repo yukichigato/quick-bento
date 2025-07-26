@@ -18,12 +18,44 @@ class Cell {
     this.colEnd = colEnd;
     this.gridInstance = gridInstance;
     this.resizing = false;
+    this.color = "#FFBBBB"; // Default color
   }
 
   getCell = () => {
     return document.querySelector(
       `[data-row-start="${this.rowStart}"][data-col-start="${this.colStart}"]`
     );
+  };
+
+  allowContextMenu = () => {
+    const cell = this.getCell();
+    const contextMenu = document.getElementById("context-menu");
+
+    cell.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+
+      const colorInput = contextMenu.querySelector("#color-input");
+      colorInput.value = this.color;
+
+      colorInput.addEventListener("input", (e) => {
+        this.color = e.target.value;
+        cell.style.backgroundColor = this.color;
+      });
+
+      const { clientX, clientY } = e;
+
+      contextMenu.style.top = `${clientY}px`;
+      contextMenu.style.left = `${clientX}px`;
+      contextMenu.classList.add("visible");
+      console.info("Context menu opened at:", clientX, clientY);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!contextMenu.contains(e.target)) {
+        contextMenu.classList.remove("visible");
+        console.info("Context menu closed");
+      }
+    });
   };
 
   allowResize = () => {
@@ -34,10 +66,6 @@ class Cell {
       position: "absolute",
       bottom: "0",
       right: "0",
-      width: "20%",
-      height: "20%",
-      cursor: "nwse-resize",
-      // backgroundColor: "red",
       zIndex: "10",
     });
 
