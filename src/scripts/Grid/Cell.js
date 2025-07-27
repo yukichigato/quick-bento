@@ -40,11 +40,6 @@ class Cell {
   };
 
   delete = (e) => {
-    const contextMenu = document.getElementById("context-menu");
-    contextMenu.removeEventListener("click", this.delete);
-    contextMenu.removeEventListener("input", this.changeColor);
-    contextMenu.classList.remove("visible");
-
     const cellIndex = this.gridInstance.cells.findIndex(
       (cell) => cell.index === this.index
     );
@@ -54,6 +49,13 @@ class Cell {
         cellIndex: cellIndex,
       });
     }
+
+    const contextMenu = document.getElementById("context-menu");
+    const colorInput = contextMenu.querySelector("#color-input");
+    const deleteCell = contextMenu.querySelector(".context-item:last-child");
+    colorInput.removeEventListener("input", this.changeColor);
+    deleteCell.removeEventListener("click", this.delete);
+    contextMenu.classList.remove("visible");
   };
 
   allowContextMenu = () => {

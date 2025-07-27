@@ -22,6 +22,7 @@ const updateMesh = ({
           newColStart,
           newRowEnd,
           newColEnd,
+          cellToRestore: { row: i, col: j },
         });
         throw new Error("Target position already occupied");
       }
@@ -38,6 +39,7 @@ const revertMeshUpdate = ({
   newColStart,
   newRowEnd,
   newColEnd,
+  cellToRestore = null,
 }) => {
   for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
     for (let j = cell.colStart; j <= cell.colEnd; j++) {
@@ -49,6 +51,10 @@ const revertMeshUpdate = ({
     for (let j = newColStart; j <= newColEnd; j++) {
       grid.mesh[i][j].isUsed = false;
     }
+  }
+
+  if (cellToRestore) {
+    grid.mesh[cellToRestore.row][cellToRestore.col].isUsed = true;
   }
 };
 
