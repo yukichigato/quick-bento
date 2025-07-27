@@ -1,13 +1,24 @@
 :root {
   --context-menu-left-offset: 0.5rem;
-  --page-primary-color: rgb(25, 26, 27);
-  --page-secondary-color: rgb(254, 250, 252);
-  --page-accent-color: rgb(248, 160, 160);
+  --dark-mode-primary: rgb(25, 26, 27);
+  --dark-mode-secondary: rgb(254, 250, 252);
+  --dark-mode-accent: rgb(248, 160, 160);
+  --light-mode-primary: rgb(255, 255, 255);
+  --light-mode-secondary: rgb(79, 92, 95);
+  --light-mode-accent: rgb(248, 160, 160);
+  /* This is for the light mode switch functionality */
+  --page-primary-color: var(--dark-mode-primary);
+  --page-secondary-color: var(--dark-mode-secondary);
+  --page-accent-color: var(--dark-mode-accent);
+  /* This is for the light mode switch functionality */
+  --cell-min-dimensions: 100%;
+  --grid-max-dimensions: 52rem;
 }
 
 * {
   box-sizing: border-box;
   position: relative;
+  font-family: "Roboto", sans-serif;
 }
 
 *::before,
@@ -17,6 +28,7 @@
 }
 
 body {
+  position: block;
   display: flex;
   align-items: center;
   margin: 0;
@@ -25,6 +37,5 @@ body {
   height: 100vh;
   width: 100vw;
 
-  font-family: Arial, sans-serif;
-  overflow: scroll;
+  overflow: hidden;
 }

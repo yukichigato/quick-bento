@@ -22,7 +22,7 @@
     padding: 0;
     padding-left: var(--context-menu-left-offset);
 
-    color: white;
+    color: var(--page-secondary-color);
     opacity: 0.5;
     font-size: small;
   }

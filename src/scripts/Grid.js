@@ -47,6 +47,7 @@ class Grid {
     );
     this.eventCreateNewCell = this.eventCreateNewCell.bind(this);
     this.updateColors = this.updateColors.bind(this);
+    this.eventEditGrid = this.eventEditGrid.bind(this);
 
     this.attachColorListeners();
   }
@@ -229,6 +230,57 @@ class Grid {
     this.drawContent();
   };
 
+  eventEditGrid = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    switch (e.target.id) {
+      case "add-row":
+        this.rows.push(new GridRow({ rowIndex: this.rowAmount }));
+        this.rowAmount++;
+        this.mesh.push(
+          Array.from({ length: this.colAmount }, () => ({ isUsed: false }))
+        );
+        break;
+      case "add-col":
+        this.cols.push(new GridCol({ colIndex: this.colAmount }));
+        this.colAmount++;
+        this.mesh.forEach((row) => row.push({ isUsed: false }));
+        break;
+      case "remove-row":
+        if (this.rowAmount <= 1) {
+          alert("Cannot remove the last row");
+          return;
+        }
+        this.rows.pop();
+        this.rowAmount--;
+        this.mesh.pop();
+        const updatedCells = this.cells.filter(
+          (cell) => cell.rowEnd < this.rowAmount
+        );
+        this.cells = updatedCells;
+        break;
+      case "remove-col":
+        if (this.colAmount <= 1) {
+          alert("Cannot remove the last column");
+          return;
+        }
+        this.cols.pop();
+        this.colAmount--;
+        this.mesh.forEach((row) => row.pop());
+        const updatedCells2 = this.cells.filter(
+          (cell) => cell.colEnd < this.colAmount
+        );
+        this.cells = updatedCells2;
+        break;
+      default:
+        console.warn(`Unknown button ID: ${buttonId}`);
+        return;
+    }
+
+    this.drawContent();
+  };
+
   drawGrid = () => {
     const gridArea = document.querySelector("#gridArea");
     const div = Object.assign(document.createElement("div"), { id: "grid" });
@@ -247,6 +299,22 @@ class Grid {
       contextMenu.style.left = `${e.clientX}px`;
       contextMenu.style.top = `${e.clientY}px`;
       contextMenu.classList.add("visible");
+
+      const addRowButton = contextMenu.querySelector("#add-row");
+      const addColButton = contextMenu.querySelector("#add-col");
+      const removeRowButton = contextMenu.querySelector("#remove-row");
+      const removeColButton = contextMenu.querySelector("#remove-col");
+
+      // Remove existing event listeners to prevent duplicates
+      addRowButton.removeEventListener("click", this.eventEditGrid);
+      addColButton.removeEventListener("click", this.eventEditGrid);
+      removeRowButton.removeEventListener("click", this.eventEditGrid);
+      removeColButton.removeEventListener("click", this.eventEditGrid);
+
+      addRowButton.addEventListener("click", this.eventEditGrid);
+      addColButton.addEventListener("click", this.eventEditGrid);
+      removeRowButton.addEventListener("click", this.eventEditGrid);
+      removeColButton.addEventListener("click", this.eventEditGrid);
     });
 
     document.addEventListener("click", (e) => {

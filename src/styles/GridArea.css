@@ -1,18 +1,26 @@
 #gridArea {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 
+  overflow: scroll;
+
   height: 100%;
   width: 100%;
 
-  border-radius: 0;
   background-color: var(--grid-background-color);
 }
 
 #grid {
-  width: 42rem;
-  height: 42rem;
+  aspect-ratio: 1 / 1;
+
+  min-width: var(--grid-max-dimensions);
+  min-height: var(--grid-max-dimensions);
+
+  max-width: var(--grid-max-dimensions);
+  max-height: var(--grid-max-dimensions);
+  width: 80%;
+  height: 80%;
+  overflow: auto;
   background-color: var(--background-color);
 }
