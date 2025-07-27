@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="description"
+      content="Quick Bento - A simple grid-based layout editor"
+    />
+    <meta name="keywords" content="grid, layout, editor, quick bento" />
+    <meta name="author" content="Yukichi" />
+    <meta name="theme-color" content="#131414" />
+    <link rel="icon" href="../public/favicon.png" />
+    <title>Quick Bento</title>
     <link rel="stylesheet" href="./styles/index.css" />
     <link rel="stylesheet" href="./styles/GridContextMenu.css" />
     <link rel="stylesheet" href="./styles/ContextMenu.css" />
@@ -19,10 +31,14 @@
   <body>
     <section id="grid-context-menu">
       <p>Grid Options</p>
-      <div class="context-item" role="button">Add Row</div>
-      <div class="context-item" role="button">Add Column</div>
-      <div class="context-item" role="button">Remove Row</div>
-      <div class="context-item" role="button">Remove Column</div>
+      <div id="add-row" class="context-item-grid" role="button">Add Row</div>
+      <div id="add-col" class="context-item-grid" role="button">Add Column</div>
+      <div id="remove-row" class="context-item-grid" role="button">
+        Remove Row
+      </div>
+      <div id="remove-col" class="context-item-grid" role="button">
+        Remove Column
+      </div>
     </section>
     <section id="context-menu">
       <p>Cell Options</p>
@@ -95,6 +111,17 @@
             value="#131414"
           />
         </li>
+        <!-- <li>
+          <label for="grid-size">Grid Size</label
+          ><input
+            type="number"
+            name="grid-size"
+            id="grid-size"
+            value="52"
+            min="0"
+            max="52"
+          />
+        </li> -->
       </ul>
     </aside>
     <main id="gridArea"></main>

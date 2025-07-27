@@ -20,8 +20,7 @@ class Cell {
     this.colEnd = colEnd;
     this.gridInstance = gridInstance;
     this.resizing = false;
-    this.color = undefined; // Default color
-    this.colorChangeTimeout = null; // For debouncing color changes
+    this.color = undefined;
     this.changeColorCustom = this.changeColorCustom.bind(this);
     this.changeColor = this.changeColor.bind(this);
     this.delete = this.delete.bind(this);
@@ -44,33 +43,23 @@ class Cell {
 
   changeColor = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    const cell = this.getCell();
 
-    // Clear any existing timeout
-    if (this.colorChangeTimeout) {
-      clearTimeout(this.colorChangeTimeout);
+    if (!cell) return;
+
+    this.color = undefined;
+
+    if (e.target.id === "set-primary-color") {
+      this.color = "var(--primary-color, gray)";
+      cell.style.backgroundColor = this.color;
+    } else if (e.target.id === "set-secondary-color") {
+      this.color = "var(--secondary-color, gray)";
+      cell.style.backgroundColor = this.color;
+    } else if (e.target.id === "set-accent-color") {
+      this.color = "var(--accent-color, gray)";
+      cell.style.backgroundColor = this.color;
     }
-
-    // Set a timeout to apply the color change after a short delay
-    this.colorChangeTimeout = setTimeout(() => {
-      const cell = this.getCell();
-
-      if (!cell) return;
-
-      this.color = undefined;
-
-      if (e.target.id === "set-primary-color") {
-        this.color = "var(--primary-color, gray)";
-        cell.style.backgroundColor = this.color;
-      } else if (e.target.id === "set-secondary-color") {
-        this.color = "var(--secondary-color, gray)";
-        cell.style.backgroundColor = this.color;
-      } else if (e.target.id === "set-accent-color") {
-        this.color = "var(--accent-color, gray)";
-        cell.style.backgroundColor = this.color;
-      }
-
-      this.colorChangeTimeout = null;
-    }, 100); // 100ms delay
   };
 
   delete = (e) => {
@@ -95,6 +84,7 @@ class Cell {
     setColorSecondary.removeEventListener("click", this.changeColor);
     setColorAccent.removeEventListener("click", this.changeColor);
     deleteCell.removeEventListener("click", this.delete);
+
     contextMenu.classList.remove("visible");
   };
 
@@ -149,12 +139,6 @@ class Cell {
     const cellDiv = this.getCell();
     const resizeArea = document.createElement("div");
     resizeArea.className = "resize-area";
-    Object.assign(resizeArea.style, {
-      position: "absolute",
-      bottom: "0",
-      right: "0",
-      zIndex: "10",
-    });
 
     resizeArea.addEventListener("mousedown", (e) => {
       e.preventDefault();

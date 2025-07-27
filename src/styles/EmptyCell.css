@@ -1,22 +1,23 @@
 .empty-cell {
-  width: 90%;
-  height: 90%;
+  width: calc(var(--cell-min-dimensions) * 0.9);
+  height: calc(var(--cell-min-dimensions) * 0.9);
   z-index: 10;
 
   align-self: center;
   justify-self: center;
 
-  border: 0.25rem solid var(--accent-color);
-  border-radius: 1rem;
+  border: 0.2rem solid var(--accent-color);
+  border-radius: 0.8rem;
 
-  background-color: none;
-  opacity: 0.5;
+  opacity: 0.4;
 
   &:hover {
     cursor: pointer;
 
     border-color: white;
+    opacity: 0.8;
     transition: border-color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 }
 
@@ -28,7 +29,7 @@
   transform: translate(-50%, -50%);
 
   color: var(--accent-color);
-  font-size: 3rem;
+  font-size: 150%;
 }
 
 .empty-cell:hover::before {

@@ -2,12 +2,20 @@
   border-radius: 1rem;
   position: relative;
 
-  > .resize-area {
-    width: 2rem;
-    height: 2rem;
+  width: var(--cell-min-dimensions);
+  height: var(--cell-min-dimensions);
 
-    border-bottom: 0.5rem solid white;
-    border-right: 0.5rem solid white;
+  > .resize-area {
+    position: absolute;
+    bottom: 0rem;
+    right: 0rem;
+    z-index: 10;
+
+    height: min(6rem, 25%);
+    aspect-ratio: 1 / 1;
+
+    border-bottom: 0.25rem solid var(--accent-color);
+    border-right: 0.25rem solid var(--accent-color);
 
     border-bottom-right-radius: inherit;
 
@@ -21,6 +29,8 @@
 
   &:hover {
     cursor: grab;
+    border: 0.1rem solid var(--accent-color);
+    transition: border-color 0.2s ease;
   }
 }
 
@@ -28,4 +38,8 @@
   opacity: 1;
   cursor: se-resize;
   transition: opacity 0.2s ease;
+}
+
+.cell:active .resize-area {
+  opacity: 0;
 }
