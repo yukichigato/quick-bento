@@ -5,6 +5,8 @@
   width: var(--cell-min-dimensions);
   height: var(--cell-min-dimensions);
 
+  box-shadow: 0 0rem 0.75rem rgba(0, 0, 0, 0.15);
+
   > .resize-area {
     position: absolute;
     bottom: 0rem;

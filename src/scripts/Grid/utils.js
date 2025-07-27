@@ -109,8 +109,8 @@ const getClosestGridCellResize = (element) => {
   let closestDistance = Infinity;
 
   const elemCenter = {
-    x: elemRect.right - elemRect.width / 6,
-    y: elemRect.bottom - elemRect.height / 6,
+    x: elemRect.right - elemRect.width / 10,
+    y: elemRect.bottom - elemRect.height / 10,
   };
 
   children.forEach((child) => {
