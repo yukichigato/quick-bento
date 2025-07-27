@@ -41,6 +41,7 @@ class Grid {
     this.gap = gap; // rem
     this.padding = 1; // rem
     this.cells = [];
+    this.drawContentTimeout = null; // For debouncing drawContent
     this.mesh = Array.from({ length: rowAmount }, () =>
       Array.from({ length: colAmount }, () => ({ isUsed: false }))
     );

@@ -6,8 +6,8 @@
   z-index: 1000;
   flex-direction: column;
 
-  color: var(--accent-color);
-  background-color: var(--secondary-color);
+  color: var(--page-secondary-color);
+  background-color: var(--page-primary-color);
 
   padding: 0.5rem;
   padding-right: 2rem;
@@ -54,7 +54,7 @@
   padding: var(--context-menu-left-offset);
 
   border-bottom: 0.1rem solid rgba(255, 255, 255, 0.171);
-  color: var(--accent-color);
+  color: var(--page-secondary-color);
 
   cursor: pointer;
 
@@ -105,11 +105,13 @@
     padding: 0.25rem;
 
     opacity: 0.8;
+
+    user-select: none;
   }
 
   &:last-child {
     border-bottom: none;
-    color: var(--primary-color);
+    color: var(--page-accent-color);
     opacity: 0.8;
   }
 }

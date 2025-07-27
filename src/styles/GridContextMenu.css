@@ -9,8 +9,8 @@
   padding: 0.5rem;
   padding-right: 2rem;
 
-  color: var(--accent-color);
-  background-color: var(--secondary-color);
+  color: var(--page-secondary-color);
+  background-color: var(--page-primary-color);
 
   border: 1px solid #cccccc7a;
   border-radius: 0.5rem;
