@@ -41,11 +41,82 @@ class Grid {
     this.gap = gap; // rem
     this.padding = 1; // rem
     this.cells = [];
+    this.drawContentTimeout = null; // For debouncing drawContent
     this.mesh = Array.from({ length: rowAmount }, () =>
       Array.from({ length: colAmount }, () => ({ isUsed: false }))
     );
     this.eventCreateNewCell = this.eventCreateNewCell.bind(this);
+    this.updateColors = this.updateColors.bind(this);
+
+    this.attachColorListeners();
   }
+
+  attachColorListeners = () => {
+    const primaryColorSelector = document.querySelector("#primary-color");
+    const secondaryColorSelector = document.querySelector("#secondary-color");
+    const accentColorSelector = document.querySelector("#accent-color");
+    const gridBackgroundColorSelector = document.querySelector(
+      "#grid-background-color"
+    );
+    const backgroundColorSelector = document.querySelector("#background-color");
+
+    document.documentElement.style.setProperty(
+      "--primary-color",
+      primaryColorSelector.value || "gray"
+    );
+    document.documentElement.style.setProperty(
+      "--secondary-color",
+      secondaryColorSelector.value || "lightgray"
+    );
+    document.documentElement.style.setProperty(
+      "--accent-color",
+      accentColorSelector.value || "blue"
+    );
+    document.documentElement.style.setProperty(
+      "--grid-background-color",
+      backgroundColorSelector.value || "white"
+    );
+    document.documentElement.style.setProperty(
+      "--background-color",
+      gridBackgroundColorSelector.value || "white"
+    );
+
+    primaryColorSelector.addEventListener("input", this.updateColors);
+    secondaryColorSelector.addEventListener("input", this.updateColors);
+    accentColorSelector.addEventListener("input", this.updateColors);
+    gridBackgroundColorSelector.addEventListener("input", this.updateColors);
+    backgroundColorSelector.addEventListener("input", this.updateColors);
+  };
+
+  updateColors = (e) => {
+    if (!e || !e.target) return;
+    if (e.target.id === "primary-color") {
+      document.documentElement.style.setProperty(
+        "--primary-color",
+        e.target.value
+      );
+    } else if (e.target.id === "secondary-color") {
+      document.documentElement.style.setProperty(
+        "--secondary-color",
+        e.target.value
+      );
+    } else if (e.target.id === "accent-color") {
+      document.documentElement.style.setProperty(
+        "--accent-color",
+        e.target.value
+      );
+    } else if (e.target.id === "grid-background-color") {
+      document.documentElement.style.setProperty(
+        "--grid-background-color",
+        e.target.value
+      );
+    } else if (e.target.id === "background-color") {
+      document.documentElement.style.setProperty(
+        "--background-color",
+        e.target.value
+      );
+    }
+  };
 
   deformCell = ({ cellIndex, rowStart, rowEnd, colStart, colEnd }) => {
     const cell = this.cells[cellIndex];
@@ -167,8 +238,6 @@ class Grid {
       gridTemplateColumns: `repeat(${this.colAmount}, 1fr)`,
       gap: `${this.gap}rem`,
       padding: `${this.padding}rem`,
-      width: "100%",
-      height: "100%",
     });
 
     div.addEventListener("contextmenu", (e) => {
@@ -231,11 +300,7 @@ class Grid {
   drawCells = () => {
     this.cells.forEach((cell) => {
       const grid = document.querySelector("#grid");
-
       const cellDiv = document.createElement("div");
-      const closeButton = document.createElement("button");
-      closeButton.textContent = "X";
-
       cellDiv.className = "cell";
       cellDiv.setAttribute("data-row-start", cell.rowStart);
       cellDiv.setAttribute("data-row-end", cell.rowEnd);
@@ -246,10 +311,9 @@ class Grid {
         gridRowEnd: cell.rowEnd + ROW_OFFSET + 1,
         gridColumnStart: cell.colStart + COL_OFFSET,
         gridColumnEnd: cell.colEnd + COL_OFFSET + 1,
-        backgroundColor: cell.color,
+        backgroundColor: cell.color ?? "var(--primary-color, gray)",
       });
       grid.appendChild(cellDiv);
-      cellDiv.appendChild(closeButton);
     });
   };
 

@@ -20,7 +20,9 @@ class Cell {
     this.colEnd = colEnd;
     this.gridInstance = gridInstance;
     this.resizing = false;
-    this.color = "#FFBBBB"; // Default color
+    this.color = undefined; // Default color
+    this.colorChangeTimeout = null; // For debouncing color changes
+    this.changeColorCustom = this.changeColorCustom.bind(this);
     this.changeColor = this.changeColor.bind(this);
     this.delete = this.delete.bind(this);
   }
@@ -31,12 +33,44 @@ class Cell {
     );
   };
 
-  changeColor = (e) => {
+  changeColorCustom = (e) => {
+    e.preventDefault();
     this.color = e.target.value;
     const cell = this.getCell();
     if (cell) {
       cell.style.backgroundColor = this.color;
     }
+  };
+
+  changeColor = (e) => {
+    e.preventDefault();
+
+    // Clear any existing timeout
+    if (this.colorChangeTimeout) {
+      clearTimeout(this.colorChangeTimeout);
+    }
+
+    // Set a timeout to apply the color change after a short delay
+    this.colorChangeTimeout = setTimeout(() => {
+      const cell = this.getCell();
+
+      if (!cell) return;
+
+      this.color = undefined;
+
+      if (e.target.id === "set-primary-color") {
+        this.color = "var(--primary-color, gray)";
+        cell.style.backgroundColor = this.color;
+      } else if (e.target.id === "set-secondary-color") {
+        this.color = "var(--secondary-color, gray)";
+        cell.style.backgroundColor = this.color;
+      } else if (e.target.id === "set-accent-color") {
+        this.color = "var(--accent-color, gray)";
+        cell.style.backgroundColor = this.color;
+      }
+
+      this.colorChangeTimeout = null;
+    }, 100); // 100ms delay
   };
 
   delete = (e) => {
@@ -52,8 +86,14 @@ class Cell {
 
     const contextMenu = document.getElementById("context-menu");
     const colorInput = contextMenu.querySelector("#color-input");
+    const setColorPrimary = contextMenu.querySelector("#set-primary-color");
+    const setColorSecondary = contextMenu.querySelector("#set-secondary-color");
+    const setColorAccent = contextMenu.querySelector("#set-accent-color");
     const deleteCell = contextMenu.querySelector(".context-item:last-child");
     colorInput.removeEventListener("input", this.changeColor);
+    setColorPrimary.removeEventListener("click", this.changeColor);
+    setColorSecondary.removeEventListener("click", this.changeColor);
+    setColorAccent.removeEventListener("click", this.changeColor);
     deleteCell.removeEventListener("click", this.delete);
     contextMenu.classList.remove("visible");
   };
@@ -62,23 +102,33 @@ class Cell {
     const cell = this.getCell();
     const contextMenu = document.getElementById("context-menu");
 
-    // Remove any existing event listeners to prevent duplicates
     const colorInput = contextMenu.querySelector("#color-input");
-    colorInput.removeEventListener("input", this.changeColor);
-
+    const setColorPrimary = contextMenu.querySelector("#set-primary-color");
+    const setColorSecondary = contextMenu.querySelector("#set-secondary-color");
+    const setColorAccent = contextMenu.querySelector("#set-accent-color");
     const deleteCell = contextMenu.querySelector(".context-item:last-child");
+
+    colorInput.removeEventListener("input", this.changeColorCustom);
+    setColorPrimary.removeEventListener("click", this.changeColor);
+    setColorSecondary.removeEventListener("click", this.changeColor);
+    setColorAccent.removeEventListener("click", this.changeColor);
     deleteCell.removeEventListener("click", this.delete);
 
     cell.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Clean up any existing listeners before adding new ones
-      colorInput.removeEventListener("input", this.changeColor);
+      colorInput.removeEventListener("input", this.changeColorCustom);
+      setColorPrimary.removeEventListener("click", this.changeColor);
+      setColorSecondary.removeEventListener("click", this.changeColor);
+      setColorAccent.removeEventListener("click", this.changeColor);
       deleteCell.removeEventListener("click", this.delete);
 
       colorInput.value = this.color;
-      colorInput.addEventListener("input", this.changeColor);
+      colorInput.addEventListener("input", this.changeColorCustom);
+      setColorPrimary.addEventListener("click", this.changeColor);
+      setColorSecondary.addEventListener("click", this.changeColor);
+      setColorAccent.addEventListener("click", this.changeColor);
       deleteCell.addEventListener("click", this.delete);
 
       const { clientX, clientY } = e;

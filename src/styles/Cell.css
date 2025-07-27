@@ -1,0 +1,31 @@
+.cell {
+  border-radius: 1rem;
+  position: relative;
+
+  > .resize-area {
+    width: 2rem;
+    height: 2rem;
+
+    border-bottom: 0.5rem solid white;
+    border-right: 0.5rem solid white;
+
+    border-bottom-right-radius: inherit;
+
+    opacity: 0;
+  }
+
+  &:active {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover {
+    cursor: grab;
+  }
+}
+
+.cell:hover .resize-area {
+  opacity: 1;
+  cursor: se-resize;
+  transition: opacity 0.2s ease;
+}

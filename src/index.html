@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="./styles/index.css" />
+    <link rel="stylesheet" href="./styles/GridContextMenu.css" />
+    <link rel="stylesheet" href="./styles/ContextMenu.css" />
+    <link rel="stylesheet" href="./styles/GridArea.css" />
+    <link rel="stylesheet" href="./styles/Cell.css" />
+    <link rel="stylesheet" href="./styles/EmptyCell.css" />
+    <link rel="stylesheet" href="./styles/Aside.css" />
     <script src="./scripts/Grid/utils.js" type="module"></script>
     <script src="./scripts/Grid/Grid.js" type="module"></script>
     <script src="./scripts/Grid/Cell.js" type="module"></script>
@@ -21,11 +27,76 @@
     <section id="context-menu">
       <p>Cell Options</p>
       <div class="context-item">
-        <label for="color-input">Color</label
-        ><input type="color" name="color-input" id="color-input" />
+        <p>Color Options</p>
+        <ul>
+          <li>
+            <label for="color-input">Custom</label
+            ><input type="color" name="color-input" id="color-input" />
+          </li>
+          <li>
+            <p id="set-primary-color" role="button">Set to primary</p>
+          </li>
+          <li>
+            <p id="set-secondary-color" role="button">Set to secondary</p>
+          </li>
+          <li>
+            <p id="set-accent-color" role="button">Set to accent</p>
+          </li>
+        </ul>
       </div>
       <div class="context-item" role="button">Remove</div>
     </section>
+
+    <aside id="aside">
+      <p>Options</p>
+      <ul>
+        <li>
+          <label for="primary-color">Primary Color</label>
+          <input
+            type="color"
+            name="primary-color"
+            id="primary-color"
+            value="#f8a0a0"
+          />
+        </li>
+        <li>
+          <label for="secondary-color">Secondary Color</label>
+          <input
+            type="color"
+            name="secondary-color"
+            id="secondary-color"
+            value="#131414"
+          />
+        </li>
+        <li>
+          <label for="accent-color">Accent Color</label>
+          <input
+            type="color"
+            name="accent-color"
+            id="accent-color"
+            value="#FFFFFF"
+          />
+        </li>
+        <li>
+          <label for="grid-background-color">Grid Background Color</label>
+          <input
+            type="color"
+            name="grid-background-color"
+            id="grid-background-color"
+            value="#131414"
+          />
+        </li>
+        <li>
+          <label for="background-color">Background Color</label>
+          <input
+            type="color"
+            name="background-color"
+            id="background-color"
+            value="#131414"
+          />
+        </li>
+      </ul>
+    </aside>
     <main id="gridArea"></main>
   </body>
 </html>
