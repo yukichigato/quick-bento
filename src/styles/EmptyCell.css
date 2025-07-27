@@ -1,6 +1,7 @@
 .empty-cell {
   width: 90%;
   height: 90%;
+  z-index: 10;
 
   align-self: center;
   justify-self: center;
@@ -8,31 +9,26 @@
   border: 0.25rem solid var(--accent-color);
   border-radius: 1rem;
 
-  z-index: 10;
-
   background-color: none;
   opacity: 0.5;
+
+  &:hover {
+    cursor: pointer;
+
+    border-color: white;
+    transition: border-color 0.2s ease;
+  }
 }
 
 .empty-cell::before {
   content: "+";
   position: absolute;
-
   top: 50%;
   left: 50%;
-
   transform: translate(-50%, -50%);
 
   color: var(--accent-color);
   font-size: 3rem;
-}
-
-.empty-cell:hover {
-  cursor: pointer;
-
-  border-color: white;
-
-  transition: border-color 0.2s ease;
 }
 
 .empty-cell:hover::before {

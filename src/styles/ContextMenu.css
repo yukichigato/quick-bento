@@ -1,14 +1,13 @@
 #context-menu {
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1000;
-
-  display: none;
   flex-direction: column;
 
-  color: white;
-  background-color: black;
+  color: var(--accent-color);
+  background-color: var(--secondary-color);
 
   padding: 0.5rem;
   padding-right: 2rem;
@@ -16,44 +15,101 @@
   border: 1px solid #cccccc7a;
   border-radius: 0.5rem;
   box-shadow: 0 1rem 1rem rgb(0, 0, 0, 0.25);
+
+  > p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    padding-left: var(--context-menu-left-offset);
+
+    color: white;
+    opacity: 0.5;
+    font-size: small;
+  }
+
+  & input[type="color"] {
+    margin: 0;
+    margin-left: 1rem;
+    padding: 0;
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    border: none;
+    border-radius: 10%;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &.visible {
+    display: flex;
+  }
 }
 
-#context-menu p {
-  margin: 0;
-  padding: 0;
-  font-size: small;
-  padding-left: var(--context-menu-left-offset);
-  margin-bottom: 0.5rem;
-  color: white;
-  opacity: 0.5;
-}
-
-#context-menu input[type="color"] {
-  margin-left: 1rem;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  border-radius: 10%;
-}
-
-#context-menu.visible {
+.context-item {
   display: flex;
-}
-
-#context-menu .context-item {
+  flex-direction: column;
   padding: var(--context-menu-left-offset);
-  cursor: pointer;
+
   border-bottom: 0.1rem solid rgba(255, 255, 255, 0.171);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+  color: var(--accent-color);
 
-#context-menu .context-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+  cursor: pointer;
 
-#context-menu .context-item:last-child {
-  border-bottom: none;
-  opacity: 0.5;
+  & ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  & label {
+    display: flex;
+    align-items: center;
+
+    opacity: 0.8;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  & li {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    padding-left: 1.5rem;
+
+    list-style: none;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  > p:first-child {
+    margin-bottom: 0.25rem;
+    padding: 0.25rem;
+
+    opacity: 1;
+    font-weight: bolder;
+  }
+
+  & p {
+    margin: 0;
+    padding: 0.25rem;
+
+    opacity: 0.8;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    color: var(--primary-color);
+    opacity: 0.8;
+  }
 }
