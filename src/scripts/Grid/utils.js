@@ -49,12 +49,12 @@ const revertMeshUpdate = ({
 
   for (let i = newRowStart; i <= newRowEnd; i++) {
     for (let j = newColStart; j <= newColEnd; j++) {
+      if (i === cellToRestore.row && j === cellToRestore.col) {
+        grid.mesh[i][j].isUsed = true;
+        return;
+      }
       grid.mesh[i][j].isUsed = false;
     }
-  }
-
-  if (cellToRestore) {
-    grid.mesh[cellToRestore.row][cellToRestore.col].isUsed = true;
   }
 };
 
