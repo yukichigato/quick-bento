@@ -5,13 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="index.css" />
+    <script src="./scripts/Grid/utils.js" type="module"></script>
     <script src="./scripts/Grid/Grid.js" type="module"></script>
-    <script src="./scripts/Grid/GridCol.js" type="module"></script>
-    <script src="./scripts/Grid/GridRow.js" type="module"></script>
     <script src="./scripts/Grid/Cell.js" type="module"></script>
     <script src="./scripts/main.js" type="module"></script>
   </head>
   <body>
+    <section id="grid-context-menu">
+      <p>Grid Options</p>
+      <div class="context-item" role="button">Add Row</div>
+      <div class="context-item" role="button">Add Column</div>
+      <div class="context-item" role="button">Remove Row</div>
+      <div class="context-item" role="button">Remove Column</div>
+    </section>
+    <section id="context-menu">
+      <p>Cell Options</p>
+      <div class="context-item">
+        <label for="color-input">Color</label
+        ><input type="color" name="color-input" id="color-input" />
+      </div>
+      <div class="context-item" role="button">Remove</div>
+    </section>
     <main id="gridArea"></main>
   </body>
 </html>
