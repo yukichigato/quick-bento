@@ -1,4 +1,4 @@
-import Grid from "./Grid/Grid.js";
+import Grid from "./scripts/Grid.js";
 
 const grid = new Grid({ rowAmount: 6, colAmount: 6, gap: 1 });
 
