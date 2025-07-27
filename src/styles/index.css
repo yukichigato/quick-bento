@@ -1,0 +1,28 @@
+:root {
+  --context-menu-left-offset: 0.5rem;
+  --page-primary-color: rgb(25, 26, 27);
+  --page-secondary-color: rgb(254, 250, 252);
+  --page-accent-color: rgb(248, 160, 160);
+}
+
+* {
+  box-sizing: border-box;
+  position: relative;
+}
+
+*::before,
+*::after {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: scroll;
+}

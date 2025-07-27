@@ -20,7 +20,7 @@ class Cell {
     this.colEnd = colEnd;
     this.gridInstance = gridInstance;
     this.resizing = false;
-    this.color = "#FFBBBB"; // Default color
+    this.color = undefined; // Default color
     this.changeColor = this.changeColor.bind(this);
     this.delete = this.delete.bind(this);
   }
