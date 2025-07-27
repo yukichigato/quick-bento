@@ -142,6 +142,22 @@ class Grid {
     this.drawContent();
   };
 
+  removeCell = ({ cellIndex }) => {
+    if (cellIndex < 0 || cellIndex >= this.cells.length) {
+      throw new Error("Invalid cell index");
+    }
+
+    const cell = this.cells[cellIndex];
+    for (let i = cell.rowStart; i <= cell.rowEnd; i++) {
+      for (let j = cell.colStart; j <= cell.colEnd; j++) {
+        this.mesh[i][j].isUsed = false;
+      }
+    }
+
+    this.cells.splice(cellIndex, 1);
+    this.drawContent();
+  };
+
   drawGrid = () => {
     const gridArea = document.querySelector("#gridArea");
     const div = Object.assign(document.createElement("div"), { id: "grid" });
@@ -154,6 +170,23 @@ class Grid {
       width: "100%",
       height: "100%",
     });
+
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const contextMenu = document.querySelector("#grid-context-menu");
+      contextMenu.style.left = `${e.clientX}px`;
+      contextMenu.style.top = `${e.clientY}px`;
+      contextMenu.classList.add("visible");
+    });
+
+    document.addEventListener("click", (e) => {
+      const contextMenu = document.querySelector("#grid-context-menu");
+      if (!contextMenu.contains(e.target)) {
+        contextMenu.classList.remove("visible");
+      }
+    });
+
     gridArea.appendChild(div);
   };
 

@@ -166,6 +166,16 @@ const revertMeshChange = (gridInstance, rowStart, rowEnd, colStart, colEnd) => {
   gridInstance.updateEmptyCells();
 };
 
+function* numberFactory(start = 0, step = 1) {
+  let current = start;
+  while (true) {
+    yield current;
+    current += step;
+  }
+}
+
+const generateNextIndex = numberFactory();
+
 export {
   updateMesh,
   revertMeshUpdate,
@@ -173,4 +183,5 @@ export {
   getClosestGridCellResize,
   temporaryMeshChange,
   revertMeshChange,
+  generateNextIndex,
 };

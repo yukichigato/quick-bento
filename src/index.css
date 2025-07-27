@@ -1,3 +1,7 @@
+:root {
+  --context-menu-left-offset: 0.5rem;
+}
+
 * {
   box-sizing: border-box;
   position: relative;
@@ -21,6 +25,50 @@ body {
   background-color: aliceblue;
 }
 
+#grid-context-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
+  display: none;
+  flex-direction: column;
+
+  color: white;
+  background-color: black;
+
+  padding: 0.5rem;
+  padding-right: 2rem;
+
+  border: 1px solid #cccccc7a;
+  border-radius: 0.5rem;
+  box-shadow: 0 1rem 1rem rgb(0, 0, 0, 0.25);
+}
+
+#grid-context-menu p {
+  margin: 0;
+  padding: 0;
+  font-size: small;
+  padding-left: var(--context-menu-left-offset);
+  margin-bottom: 0.5rem;
+  color: white;
+  opacity: 0.5;
+}
+
+#grid-context-menu.visible {
+  display: flex;
+}
+
+#grid-context-menu .context-item {
+  padding: var(--context-menu-left-offset);
+  cursor: pointer;
+  border-bottom: 0.1rem solid rgba(255, 255, 255, 0.171);
+}
+
+#grid-context-menu .context-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 #context-menu {
   position: absolute;
   top: 0;
@@ -41,6 +89,16 @@ body {
   box-shadow: 0 1rem 1rem rgb(0, 0, 0, 0.25);
 }
 
+#context-menu p {
+  margin: 0;
+  padding: 0;
+  font-size: small;
+  padding-left: var(--context-menu-left-offset);
+  margin-bottom: 0.5rem;
+  color: white;
+  opacity: 0.5;
+}
+
 #context-menu input[type="color"] {
   margin-left: 1rem;
   width: 2rem;
@@ -53,19 +111,10 @@ body {
   display: flex;
 }
 
-#context-menu p {
-  font-size: small;
-  color: rgba(255, 255, 255, 0.469);
-}
-
 #context-menu .context-item {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: var(--context-menu-left-offset);
   cursor: pointer;
   border-bottom: 0.1rem solid rgba(255, 255, 255, 0.171);
-}
-
-.context-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -77,6 +126,7 @@ body {
 
 #context-menu .context-item:last-child {
   border-bottom: none;
+  opacity: 0.5;
 }
 
 #gridArea {

@@ -3,6 +3,7 @@ import {
   getClosestGridCellResize,
   temporaryMeshChange,
   revertMeshChange,
+  generateNextIndex,
 } from "./utils.js";
 
 let newX = 0;
@@ -12,6 +13,7 @@ let startY = 0;
 
 class Cell {
   constructor({ rowStart, rowEnd, colStart, colEnd, gridInstance }) {
+    this.index = generateNextIndex.next().value;
     this.rowStart = rowStart;
     this.rowEnd = rowEnd;
     this.colStart = colStart;
@@ -19,6 +21,8 @@ class Cell {
     this.gridInstance = gridInstance;
     this.resizing = false;
     this.color = "#FFBBBB"; // Default color
+    this.changeColor = this.changeColor.bind(this);
+    this.delete = this.delete.bind(this);
   }
 
   getCell = () => {
@@ -27,33 +31,64 @@ class Cell {
     );
   };
 
+  changeColor = (e) => {
+    this.color = e.target.value;
+    const cell = this.getCell();
+    if (cell) {
+      cell.style.backgroundColor = this.color;
+    }
+  };
+
+  delete = (e) => {
+    const contextMenu = document.getElementById("context-menu");
+    contextMenu.removeEventListener("click", this.delete);
+    contextMenu.removeEventListener("input", this.changeColor);
+    contextMenu.classList.remove("visible");
+
+    const cellIndex = this.gridInstance.cells.findIndex(
+      (cell) => cell.index === this.index
+    );
+
+    if (cellIndex !== -1) {
+      this.gridInstance.removeCell({
+        cellIndex: cellIndex,
+      });
+    }
+  };
+
   allowContextMenu = () => {
     const cell = this.getCell();
     const contextMenu = document.getElementById("context-menu");
 
+    // Remove any existing event listeners to prevent duplicates
+    const colorInput = contextMenu.querySelector("#color-input");
+    colorInput.removeEventListener("input", this.changeColor);
+
+    const deleteCell = contextMenu.querySelector(".context-item:last-child");
+    deleteCell.removeEventListener("click", this.delete);
+
     cell.addEventListener("contextmenu", (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
-      const colorInput = contextMenu.querySelector("#color-input");
+      // Clean up any existing listeners before adding new ones
+      colorInput.removeEventListener("input", this.changeColor);
+      deleteCell.removeEventListener("click", this.delete);
+
       colorInput.value = this.color;
-
-      colorInput.addEventListener("input", (e) => {
-        this.color = e.target.value;
-        cell.style.backgroundColor = this.color;
-      });
+      colorInput.addEventListener("input", this.changeColor);
+      deleteCell.addEventListener("click", this.delete);
 
       const { clientX, clientY } = e;
 
       contextMenu.style.top = `${clientY}px`;
       contextMenu.style.left = `${clientX}px`;
       contextMenu.classList.add("visible");
-      console.info("Context menu opened at:", clientX, clientY);
     });
 
     document.addEventListener("click", (e) => {
       if (!contextMenu.contains(e.target)) {
         contextMenu.classList.remove("visible");
-        console.info("Context menu closed");
       }
     });
   };
@@ -96,7 +131,9 @@ class Cell {
         if (row !== null && col !== null) {
           try {
             this.gridInstance.deformCell({
-              cellIndex: this.gridInstance.cells.indexOf(this),
+              cellIndex: this.gridInstance.cells.findIndex(
+                (cell) => cell.index === this.index
+              ),
               rowStart: this.rowStart,
               rowEnd: row,
               colStart: this.colStart,
@@ -182,7 +219,9 @@ class Cell {
         if (row !== null && col !== null) {
           try {
             this.gridInstance.moveCell({
-              cellIndex: this.gridInstance.cells.indexOf(this),
+              cellIndex: this.gridInstance.cells.findIndex(
+                (cell) => cell.index === this.index
+              ),
               movementRows: row - this.rowStart,
               movementCols: col - this.colStart,
             });

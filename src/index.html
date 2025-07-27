@@ -11,14 +11,21 @@
     <script src="./scripts/main.js" type="module"></script>
   </head>
   <body>
-    <div id="context-menu">
-      <p>Context menu</p>
+    <section id="grid-context-menu">
+      <p>Grid Options</p>
+      <div class="context-item" role="button">Add Row</div>
+      <div class="context-item" role="button">Add Column</div>
+      <div class="context-item" role="button">Remove Row</div>
+      <div class="context-item" role="button">Remove Column</div>
+    </section>
+    <section id="context-menu">
+      <p>Cell Options</p>
       <div class="context-item">
         <label for="color-input">Color</label
         ><input type="color" name="color-input" id="color-input" />
       </div>
-      <div class="context-item">Remove</div>
-    </div>
+      <div class="context-item" role="button">Remove</div>
+    </section>
     <main id="gridArea"></main>
   </body>
 </html>
